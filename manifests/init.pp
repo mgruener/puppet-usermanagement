@@ -1,34 +1,44 @@
 class usermanagement ($users = hiera_hash('users'),
                       $groups = hiera_hash('groups'),
-                      $usermaps = hiera_hash('localusers',undef),
-                      $groupmaps = hiera_hash('localgroups',undef)){
+                      $usermaps = hiera_array('localusers',undef),
+                      $groupmaps = hiera_array('localgroups',undef)){
 
-  if $usermaps {
-    # create virtual resources from _all_ user data found
-    # in the hiera data
-    create_resources('@usermanagement::user',hiera_hash('users'))
+  if $users {
+    if $usermaps {
+      # create virtual resources from _all_ user data found
+      # in the hiera data
+      create_resources("@${module_name}::user",$users)
 
-    # from the virtual resources created above, realize all
-    # users that belong on this system
-    realize Usermanagement::User[hiera_array('localusers')]
+      # from the virtual resources created above, realize all
+      # users that belong on this system
+      realize Usermanagement::User[$usermaps]
+    }
+    else {
+      # no user mappings given, create all users found in the hiera data
+      create_resources("${module_name}::user",$users)
+    }
   }
   else {
-    # no user mappings given, create all users found in the hiera data
-    create_resources('usermanagement::user',hiera_hash('users'))
+    notice("No users found")
   }
 
-  if $groupmaps {
-    # create virtual resources from _all_ group data found
-    # in the hiera data
-    create_resources('@group',hiera_hash('groups'))
+  if $groups {
+    if $groupmaps {
+      # create virtual resources from _all_ group data found
+      # in the hiera data
+      create_resources('@group',$groups)
 
-    # from the virtual resources created above, realize all
-    # groups that belong on this system
-    realize Group[hiera_array('localgroups')]
+      # from the virtual resources created above, realize all
+      # groups that belong on this system
+      realize Group[$groupmaps]
+    }
+    else {
+      # no group mappings given, create all groups found in the hiera data
+      create_resources('group',$groups)
+    }
   }
   else {
-    # no group mappings given, create all groups found in the hiera data
-    create_resources('group',hiera_hash('groups'))
+    notice("No groups found")
   }
 
   file { '/etc/sudoers':

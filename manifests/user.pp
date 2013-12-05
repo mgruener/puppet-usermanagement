@@ -10,14 +10,14 @@ define usermanagement::user ( $ensure = present,
                               $sshkey = $title) {
 
   case $ensure {
-    present => {  $dir_ensure = directory
-                  $file_ensure = file
+    present: {  $dir_ensure = directory
+                $file_ensure = file
     }
-    absent  => {  $dir_ensure = absent
-                  $file_ensure = absent
+    absent: { $dir_ensure = absent
+              $file_ensure = absent
     }
-    default => {  err("${ensure} is not a valid value for \$ensure!")
-                  fail()
+    default: {  err("${ensure} is not a valid value for \$ensure!")
+                fail()
     }
   }
 
@@ -59,7 +59,7 @@ define usermanagement::user ( $ensure = present,
     }
 
     file { "${home}/.ssh/authorized_keys":
-      ensure  => $file_ensure
+      ensure  => $file_ensure,
       owner   => $name,
       source  => "puppet:///modules/${module_name}/sshkeys/${sshkey}",
       mode    => '0600',
