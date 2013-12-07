@@ -1,7 +1,7 @@
-class usermanagement ($users = hiera_hash('users'),
-                      $groups = hiera_hash('groups'),
-                      $usermaps = hiera_array('localusers',undef),
-                      $groupmaps = hiera_array('localgroups',undef)){
+class usermanagement ($users = hiera_hash("${module_name}::users"),
+                      $groups = hiera_hash("${module_name}::groups"),
+                      $usermaps = hiera_array("${module_name}::localusers",undef),
+                      $groupmaps = hiera_array("${module_name}::localgroups",undef)){
 
   if $users {
     if $usermaps {
