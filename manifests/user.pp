@@ -11,9 +11,11 @@ define usermanagement::user ( $ensure = present,
 
   case $ensure {
     present: {  $dir_ensure = directory
+                $recurse = false
                 $file_ensure = file
     }
     absent: { $dir_ensure = absent
+              $recurse = true
               $file_ensure = absent
     }
     default: {  err("${ensure} is not a valid value for \$ensure!")
@@ -53,7 +55,7 @@ define usermanagement::user ( $ensure = present,
       ensure  => $dir_ensure,
       owner   => $name,
       force   => true,
-      recurse => true,
+      recurse => $recurse,
       mode    => '0700',
       require => User[$title],
     }
