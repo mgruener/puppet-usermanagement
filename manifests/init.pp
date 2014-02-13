@@ -5,6 +5,7 @@ class usermanagement (
   $groupdefaults = undef,
   $usermaps = undef,
   $groupmaps = undef,
+  $install_sudoers = true,
   $hiera_merge = false,
 ) {
 
@@ -20,6 +21,19 @@ class usermanagement (
     }
     default: {
       fail("${myclass}::hiera_merge type must be true or false.")
+    }
+  }
+
+  case type($install_sudoers) {
+    'string': {
+      validate_re($install_sudoers, '^(true|false)$', "${myclass}::install_sudoers may be either 'true' or 'false' and is set to <${install_sudoers}>.")
+      $install_sudoers_real = str2bool($install_sudoers)
+    }
+    'boolean': {
+      $install_sudoers_real = $install_sudoers
+    }
+    default: {
+      fail("${myclass}::install_sudoers type must be true or false.")
     }
   }
 
@@ -129,10 +143,12 @@ class usermanagement (
     notice('No groups found')
   }
 
-  file { '/etc/sudoers':
-    ensure => present,
-    owner  => root,
-    mode   => '0440',
-    source => "puppet:///modules/${myclass}/sudoers"
+  if $install_sudoers_real {
+    file { '/etc/sudoers':
+      ensure => present,
+      owner  => root,
+      mode   => '0440',
+      source => "puppet:///modules/${myclass}/sudoers"
+    }
   }
 }
