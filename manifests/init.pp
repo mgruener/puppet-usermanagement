@@ -1,6 +1,8 @@
 class usermanagement (
   $users = undef,
   $groups = undef,
+  $userdefaults = undef,
+  $groupdefaults = undef,
   $usermaps = undef,
   $groupmaps = undef,
   $hiera_merge = false,
@@ -19,6 +21,34 @@ class usermanagement (
     default: {
       fail("${myclass}::hiera_merge type must be true or false.")
     }
+  }
+
+  if $userdefaults != undef {
+    if !is_hash($userdefaults) {
+        fail("${myclass}::userdefaults must be a hash.")
+    }
+
+    if $hiera_merge_real == true {
+      $userdefaults_real = hiera_hash("${myclass}::userdefaults",{})
+    } else {
+      $userdefaults_real = $userdefaults
+    }
+  } else {
+    $userdefaults_real = {}
+  }
+
+  if $groupdefaults != undef {
+    if !is_hash($groupdefaults) {
+        fail("${myclass}::groupdefaults must be a hash.")
+    }
+
+    if $hiera_merge_real == true {
+      $groupdefaults_real = hiera_hash("${myclass}::groupdefaults",{})
+    } else {
+      $groupdefaults_real = $groupdefaults
+    }
+  } else {
+    $groupdefaults_real = {}
   }
 
   if $users != undef {
@@ -45,7 +75,7 @@ class usermanagement (
 
       # create virtual resources from _all_ user data found
       # in the hiera data
-      create_resources("@${myclass}::user",$users_real)
+      create_resources("@${myclass}::user",$users_real,$userdefaults_real)
 
       # from the virtual resources created above, realize all
       # users that belong on this system
@@ -53,7 +83,7 @@ class usermanagement (
     }
     else {
       # no user mappings given, create all users found in the hiera data
-      create_resources("${myclass}::user",$users_real)
+      create_resources("${myclass}::user",$users_real,$userdefaults_real)
     }
   }
   else {
@@ -84,7 +114,7 @@ class usermanagement (
 
       # create virtual resources from _all_ group data found
       # in the hiera data
-      create_resources('@group',$groups_real)
+      create_resources('@group',$groups_real,$groupdefaults_real)
 
       # from the virtual resources created above, realize all
       # groups that belong on this system
@@ -92,7 +122,7 @@ class usermanagement (
     }
     else {
       # no group mappings given, create all groups found in the hiera data
-      create_resources('group',$groups_real)
+      create_resources('group',$groups_real,$groupdefaults_real)
     }
   }
   else {
