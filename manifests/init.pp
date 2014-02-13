@@ -1,7 +1,9 @@
-class usermanagement ($users = hiera_hash("${module_name}::users"),
-                      $groups = hiera_hash("${module_name}::groups"),
-                      $usermaps = hiera_array("${module_name}::localusers",undef),
-                      $groupmaps = hiera_array("${module_name}::localgroups",undef)){
+class usermanagement (
+  $users = hiera_hash("${module_name}::users"),
+  $groups = hiera_hash("${module_name}::groups"),
+  $usermaps = hiera_array("${module_name}::localusers",undef),
+  $groupmaps = hiera_array("${module_name}::localgroups",undef)
+) {
 
   if $users {
     if $usermaps {
@@ -19,7 +21,7 @@ class usermanagement ($users = hiera_hash("${module_name}::users"),
     }
   }
   else {
-    notice("No users found")
+    notice('No users found')
   }
 
   if $groups {
@@ -38,7 +40,7 @@ class usermanagement ($users = hiera_hash("${module_name}::users"),
     }
   }
   else {
-    notice("No groups found")
+    notice('No groups found')
   }
 
   file { '/etc/sudoers':

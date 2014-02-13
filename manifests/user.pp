@@ -1,13 +1,15 @@
-define usermanagement::user ( $ensure = present,
-                              $comment = undef,
-                              $managehome = false,
-                              $home = "/home/${name}",
-                              $password = undef,
-                              $uid = undef,
-                              $gid = undef,
-                              $shell = undef,
-                              $groups = undef,
-                              $sshkey = $title) {
+define usermanagement::user (
+  $ensure = present,
+  $comment = undef,
+  $managehome = false,
+  $home = "/home/${name}",
+  $password = undef,
+  $uid = undef,
+  $gid = undef,
+  $shell = undef,
+  $groups = undef,
+  $sshkey = $title
+) {
 
   case $ensure {
     present: {  $dir_ensure = directory
