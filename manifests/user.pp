@@ -8,22 +8,9 @@ define usermanagement::user (
   $gid = undef,
   $shell = undef,
   $groups = undef,
-  $sshkey = $title
+  $sshkeyfilepath = "/etc/puppet/modules/${module_name}/files/sshkeys",
+  $sshkeyfile = $title
 ) {
-
-  case $ensure {
-    present: {  $dir_ensure = directory
-                $recurse = false
-                $file_ensure = file
-    }
-    absent: { $dir_ensure = absent
-              $recurse = true
-              $file_ensure = absent
-    }
-    default: {  err("${ensure} is not a valid value for \$ensure!")
-                fail()
-    }
-  }
 
   user { $title:
     ensure     => $ensure,
@@ -50,24 +37,15 @@ define usermanagement::user (
     }
   }
 
-  # yes, I know, don't ask
-  if $sshkey {
+  if $sshkeyfile {
+    $sshkeydata = chomp(split(file("${sshkeyfilepath}/${sshkeyfile}"),' '))
 
-    file { "${home}/.ssh":
-      ensure  => $dir_ensure,
-      owner   => $name,
-      force   => true,
-      recurse => $recurse,
-      mode    => '0700',
-      require => User[$title],
-    }
-
-    file { "${home}/.ssh/authorized_keys":
-      ensure  => $file_ensure,
-      owner   => $name,
-      source  => "puppet:///modules/${module_name}/sshkeys/${sshkey}",
-      mode    => '0600',
-      require => File["${home}/.ssh/"],
+    ssh_authorized_key { $title:
+      name   => "${name}-${sshkeydata[2]}",
+      ensure => $ensure,
+      key    => $sshkeydata[1],
+      type   => $sshkeydata[0],
+      user   => $name
     }
   }
 }
