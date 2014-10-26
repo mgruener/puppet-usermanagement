@@ -8,7 +8,7 @@ define usermanagement::user (
   $gid = undef,
   $shell = undef,
   $groups = undef,
-  $sshkeyfilepath = "/etc/puppet/modules/${module_name}/files/sshkeys",
+  $sshkeyfilepath = "${module_name}/sshkeys",
   $sshkeyfile = $title
 ) {
 
