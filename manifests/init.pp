@@ -146,7 +146,8 @@ class usermanagement (
   if $install_sudoers_real {
     file { '/etc/sudoers':
       ensure => present,
-      owner  => root,
+      owner  => 'root',
+      group  => 'root',
       mode   => '0440',
       source => "puppet:///modules/${myclass}/sudoers"
     }
